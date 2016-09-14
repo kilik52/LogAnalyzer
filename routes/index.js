@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
 router.get('/api/accumulateUserRetation', function (req, res) {
     res.send('ok');
 
-    var days = ["2016.08.20", "2016.08.21", "2016.08.22", "2016.08.23"];
+    var days = ["2016.9.10", "2016.09.11", "2016.09.12", "2016.09.13"];
     var counts = [];
 
     async.eachSeries(days, function (day, callback) {
@@ -65,6 +65,7 @@ function getNewUserForDay(day, cb) {
                 ]
             }
         },
+        "size": 500,
         "_source": ["auth"]
     };
 
@@ -79,7 +80,7 @@ function getNewUserForDay(day, cb) {
             if (info && info.hits && info.hits.hits) {
                 for (var i = 0; i < info.hits.hits.length; i++) {
                     var hit = info.hits.hits[i];
-                    users.push(hit._source.auth);
+                    if (hit._source.auth != "-") users.push(hit._source.auth);
                 }
             }
             cb(null, users);
@@ -108,44 +109,6 @@ function userActiveInDay(user, day, cb) {
 
             var exist = (info && info.hits && info.hits.hits && info.hits.hits.length > 0);
             cb(null, exist);
-        }
-        else {
-            cb("error");
-        }
-    });
-}
-
-function getActiveUserForDay(day, cb) {
-    var params = {
-        "query": {
-            "bool": {
-                "must_not": [
-                    {
-                        "match": {
-                            "auth.raw": '"-"'
-                        }
-                    }
-                ]
-            }
-        },
-        "_source": ["auth"]
-    };
-
-    request.post({
-        url: "http://localhost:9200/logstash-" + day + "/_search",
-        body: JSON.stringify(params)
-    }, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var info = JSON.parse(body);
-
-            var users = [];
-            if (info && info.hits && info.hits.hits) {
-                for (var i = 0; i < info.hits.hits.length; i++) {
-                    var hit = info.hits.hits[i];
-                    users.push(hit._source.auth);
-                }
-            }
-            cb(null, users);
         }
         else {
             cb("error");
