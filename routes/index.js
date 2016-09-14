@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
 router.get('/api/accumulateUserRetation', function (req, res) {
     res.send('ok');
 
-    var days = ["2016.9.10", "2016.09.11", "2016.09.12", "2016.09.13"];
+    var days = ["2016.09.10", "2016.09.11", "2016.09.12", "2016.09.13"];
     var counts = [];
 
     async.eachSeries(days, function (day, callback) {
@@ -92,13 +92,14 @@ function getNewUserForDay(day, cb) {
 
             var users = [];
             if (info && info.hits && info.hits.hits) {
+                //console.log(info.hits.total);
                 for (var i = 0; i < info.hits.hits.length; i++) {
                     var hit = info.hits.hits[i];
                     if (hit._source.url_params.indexOf("&signin=1") < 0) {
                         users.push(hit._source.auth);
                     }
                     else {
-                        console.log(hit._source.url_params);
+                        //console.log(hit._source.url_params);
                     }
                 }
             }
