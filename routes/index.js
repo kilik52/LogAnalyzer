@@ -51,15 +51,21 @@ function getNewUserForDay(day, cb) {
     var params = {
         "query": {
             "bool": {
-                "must": [
+                "should": [
                     {
                         "match": {
-                            "verb": "POST"
+                            "url_path": {
+                                "query": "api/v2/signup",
+                                "type": "phrase"
+                            }
                         }
                     },
                     {
                         "match": {
-                            "request": "/api/v2/signup"
+                            "url_path": {
+                                "query": "api/v2/social_auth",
+                                "type": "phrase"
+                            }
                         }
                     }
                 ]
