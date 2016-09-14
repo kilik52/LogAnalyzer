@@ -68,11 +68,19 @@ function getNewUserForDay(day, cb) {
                             }
                         }
                     }
-                ]
+                ],
+                "must_not": {
+                    "match": {
+                        "auth.raw": {
+                            "query": "-",
+                            "type": "phrase"
+                        }
+                    }
+                }
             }
         },
         "size": 500,
-        "_source": ["auth"]
+        "_source": ["auth", "url_params"]
     };
 
     request.post({
@@ -86,7 +94,12 @@ function getNewUserForDay(day, cb) {
             if (info && info.hits && info.hits.hits) {
                 for (var i = 0; i < info.hits.hits.length; i++) {
                     var hit = info.hits.hits[i];
-                    if (hit._source.auth != "-") users.push(hit._source.auth);
+                    if (hit._source.url_params.indexOf("&signin=1") < 0) {
+                        users.push(hit._source.auth);
+                    }
+                    else {
+                        console.log(hit._source.url_params);
+                    }
                 }
             }
             cb(null, users);
